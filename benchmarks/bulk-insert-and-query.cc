@@ -403,6 +403,11 @@ int main(int argc, char * argv[]) {
     {117, "XorBinaryFuse16"},
     {118, "XorBinaryFuse8-4wise"},
     {119, "XorBinaryFuse16-4wise"},
+
+    {217, "XorFuse16-vanilla"},
+    {219, "XorFuse16-vanilla-4wise"},
+
+
     {1056, "HomogRibbon64_5"},
     {1076, "HomogRibbon64_7"}, // interesting
     {1086, "HomogRibbon64_8"},
@@ -1016,7 +1021,20 @@ int main(int argc, char * argv[]) {
           add_count, to_add, intersectionsize, mixed_sets,  true);
       cout << setw(NAME_WIDTH) << names[a] << cf << endl;
   }  
-  
+  a = 217;
+  if (algorithmId == a || algorithmId < 0 || (algos.find(a) != algos.end())) {
+      auto cf = FilterBenchmark<
+          xorfusefilter_vanilla::XorFuseFilter<uint64_t, uint16_t>>(
+          add_count, to_add, intersectionsize, mixed_sets,  true);
+      cout << setw(NAME_WIDTH) << names[a] << cf << endl;
+  }
+  a = 219;
+  if (algorithmId == a || algorithmId < 0 || (algos.find(a) != algos.end())) {
+      auto cf = FilterBenchmark<
+          xorfusefilter_vanilla4wise::XorFuseFilter<uint64_t, uint16_t>>(
+          add_count, to_add, intersectionsize, mixed_sets,  true);
+      cout << setw(NAME_WIDTH) << names[a] << cf << endl;
+  }
    // Homogeneous Ribbon
   a = 1056;
   if (algorithmId == a || (algos.find(a) != algos.end())) {
