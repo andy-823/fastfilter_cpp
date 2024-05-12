@@ -62,7 +62,7 @@ class XorFuseFilter
    * Dense Peelable Random Uniform Hypergraphs.
    * In 27th Annual European Symposium on Algorithms (ESA 2019)
    */
-  static constexpr double dencity = 0.972; // threshold is 0.97677
+  static constexpr double dencity = 0.96; // threshold is 0.97677
 
   FingerprintType *fingerprints;
 
@@ -84,10 +84,10 @@ class XorFuseFilter
     
     // harcoding for small values
     // need segmentCount << segmentLength
-    while (segmentCount_ * segmentCount_ > 10 * size)
-    {
-      segmentCount_ /= 2;
-    }
+    // while (segmentCount_ * segmentCount_ > 10 * size)
+    // {
+    //   segmentCount_ /= 2;
+    // }
     
     double sizeFactor;
     if (segmentCount_ > 0) // segmentCount has been set
