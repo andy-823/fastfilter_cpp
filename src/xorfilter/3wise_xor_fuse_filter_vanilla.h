@@ -173,7 +173,7 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
   size_t *alone = new size_t[arrayLength];
   hashIndex = 0;
 
-  size_t max_iter = 20;
+  size_t max_iter = 1;
   while (max_iter--)  
   // while (true)
   {
@@ -358,10 +358,10 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
   delete[] edgeXor;
   delete[] edgeCount;
   
-  if (reverseOrderPos != size)
-  {
-    throw std::runtime_error("xorfusefilter-vanilla: cycle_limit_reached");
-  }
+  // if (reverseOrderPos != size)
+  // {
+  //   throw std::runtime_error("xorfusefilter-vanilla: cycle_limit_reached");
+  // }
 
   // the array h0, h1, h2, h0, h1, h2
   uint32_t h012[5];

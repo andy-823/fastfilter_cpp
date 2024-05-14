@@ -22,14 +22,14 @@ struct test_params
 
 template <typename Filter = xorfusefilter_vanilla::XorFuseFilter<
               uint64_t, uint8_t>>
-int check_block_size(size_t add_count, size_t block_size, int tries = 10) 
+int check_block_count(size_t add_count, size_t block_count, int tries = 10) 
 {
   int successes = 0;
   int failures = 0;
   for (int cur_try = 1; cur_try <= tries; cur_try++)
   {
     std::vector<uint64_t> source = GenerateRandom64(add_count);
-    Filter filter(add_count, block_size);
+    Filter filter(add_count, block_count);
 
     try
     {
@@ -51,16 +51,16 @@ int check_block_size(size_t add_count, size_t block_size, int tries = 10)
     }
     if (float(successes + (tries - cur_try)) / (successes + failures + (tries - cur_try)) < 0.9)
     {
-      return 0; // bad size
+      return 0; // bad count
     } 
   }  
-  return 1; // good size
+  return 1; // good count
 }
 
 
 template <typename Filter = xorfusefilter_vanilla::XorFuseFilter<
               uint64_t, uint8_t>>
-void stream_best_block_sizes(const test_params &params)
+void stream_best_block_counts(const test_params &params)
 {
   std::cout << "-";
   int add_count = params.start_size;
@@ -70,22 +70,22 @@ void stream_best_block_sizes(const test_params &params)
     int l = 1;
     int r = std::sqrt(add_count);
     
-    int block_size = 1; // search for max block_size that generating probability is high
+    int block_count = 1; // search for max block_count that generating probability is high
     // [l, r)
     while (l + 1 < r) // very accurate, do we need such??
     {
       int mid = (l + r) / 2;
-      if (!check_block_size<Filter>(add_count, mid, params.one_test_tries))
+      if (!check_block_count<Filter>(add_count, mid, params.one_test_tries))
       {
-        r = mid; // bad size
+        r = mid; // bad count
       }
-      else // good size
+      else // good count
       {
-        block_size = mid; 
+        block_count = mid; 
         l = mid;
       }
     }
-    std::cout << add_count << " " << block_size << "\n";
+    std::cout << add_count << " " << block_count << "\n";
     add_count *= params.size_multiplier;
   }
   std::cout << "\n";
@@ -112,10 +112,10 @@ int main(int argc, char * argv[])
   }
   
   std::cout << "xorfusefilter_vanilla\n";
-  stream_best_block_sizes<xorfusefilter_vanilla::XorFuseFilter<uint64_t, uint8_t>>(params);
+  stream_best_block_counts<xorfusefilter_vanilla::XorFuseFilter<uint64_t, uint8_t>>(params);
 
   std::cout << "xorfusefilter_vanilla4wise\n";
-  stream_best_block_sizes<xorfusefilter_vanilla4wise::XorFuseFilter<uint64_t, uint8_t>>(params);
+  stream_best_block_counts<xorfusefilter_vanilla4wise::XorFuseFilter<uint64_t, uint8_t>>(params);
 
   return EXIT_SUCCESS;
 }

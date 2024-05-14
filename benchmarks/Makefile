@@ -26,7 +26,8 @@ HEADERS = $(wildcard ../src/*.h \
 
 .PHONY: all
 
-BINS = bulk-insert-and-query.exe stream.exe construction-failure.exe test-block-size.exe test-block-size2.exe
+BINS = bulk-insert-and-query.exe stream.exe construction-failure.exe \
+       test-block-count.exe test-block-cout2.exe test-block-count3.exe
 
 all: $(BINS)
 
