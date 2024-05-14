@@ -84,10 +84,10 @@ class XorFuseFilter
     
     // harcoding for small values
     // need segmentCount << segmentLength
-    while (segmentCount_ * segmentCount_ > 10 * size)
-    {
-      segmentCount_ /= 2;
-    }
+    // while (segmentCount_ * segmentCount_ * 10 > size)
+    // {
+    //   segmentCount_ /= 2;
+    // }
     
     double sizeFactor;
     if (segmentCount_ > 0) // segmentCount has been set
