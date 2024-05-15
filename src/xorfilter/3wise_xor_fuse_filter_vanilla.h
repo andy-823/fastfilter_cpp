@@ -82,13 +82,6 @@ class XorFuseFilter
     h = new HashFamily[3]();
     this->size = size;
     
-    // harcoding for small values
-    // need segmentCount << segmentLength
-    // while (segmentCount_ * segmentCount_ * 10 > size)
-    // {
-    //   segmentCount_ /= 2;
-    // }
-    
     double sizeFactor;
     if (segmentCount_ > 0) // segmentCount has been set
     {
@@ -102,20 +95,34 @@ class XorFuseFilter
     }
     else // default
     {
-      sizeFactor = fmax(1.125, 0.875 + 0.25 * log(1000000) / log(size));
-      this->segmentLength = std::max(size_t(1), size_t(4.8 * std::pow(size, 0.58)));
+      this->segmentCount = 0.201 * pow(size, 0.43); // 0.4300000000000002 0.201416015625
+      this->segmentCount = std::max(1, segmentCount);
+      sizeFactor = (this->segmentCount + arity - 1) 
+                          / (this->segmentCount * this->dencity);
 
-      size_t capacity = size * sizeFactor;
-      this->segmentCount = (capacity + this->segmentLength - 1) 
-                            / this->segmentLength;
-      this->segmentCount = this->segmentCount <= arity - 1 
-                            ? 1 : this->segmentCount - (arity - 1);
+      if (size < 1000 || sizeFactor > 1.23) // xorfilter
+      {
+        this->segmentCount = 1;
+        this->segmentLength = (size * 1.23 + 32) / 3; 
+      }
+      else
+      {
+        size_t capacity = size * sizeFactor;
+        this->segmentLength = (capacity + this->segmentCount - 1) / this->segmentCount;
+      }
+      // sizeFactor = fmax(1.125, 0.875 + 0.25 * log(1000000) / log(size));
+      // this->segmentLength = std::max(size_t(1), size_t(4.8 * std::pow(size, 0.58)));
+
+      // size_t capacity = size * sizeFactor;
+      // this->segmentCount = (capacity + this->segmentLength - 1) 
+      //                       / this->segmentLength;
+      // this->segmentCount = this->segmentCount <= arity - 1 
+      //                       ? 1 : this->segmentCount - (arity - 1);
     }
     this->arrayLength = (this->segmentCount + arity - 1) * this->segmentLength;
     this->segmentCountLength = this->segmentCount * this->segmentLength;
     fingerprints = new FingerprintType[arrayLength]();
     std::fill_n(fingerprints, arrayLength, 0);
-
   }
 
   ~XorFuseFilter()
@@ -173,9 +180,9 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
   size_t *alone = new size_t[arrayLength];
   hashIndex = 0;
 
-  size_t max_iter = 1;
-  while (max_iter--)  
-  // while (true)
+  // size_t max_iter = 1;
+  // while (max_iter--)  
+  while (true)
   {
     memset(edgeCount, 0, sizeof(uint16_t) * arrayLength);
     memset(edgeXor, 0, sizeof(edge) * arrayLength);
@@ -357,11 +364,6 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
   delete[] alone;
   delete[] edgeXor;
   delete[] edgeCount;
-  
-  // if (reverseOrderPos != size)
-  // {
-  //   throw std::runtime_error("xorfusefilter-vanilla: cycle_limit_reached");
-  // }
 
   // the array h0, h1, h2, h0, h1, h2
   uint32_t h012[5];
