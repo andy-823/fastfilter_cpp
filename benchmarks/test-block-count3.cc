@@ -38,10 +38,6 @@ void stream_best_block_counts(const test_params &params, std::mutex &mutex, cons
 
   auto check_block_count = [&](size_t add_count, int block_count, int tries)->bool
   {
-    if (add_count >= 10'000'000)
-    {
-      tries = std::max(1, tries / 2);
-    }
     // with tries equals to 1 it looks weird
     int allowed_failures = std::max(int(tries * 0.1), 1);
     allowed_failures -= (tries == 1); // fix of problem above
@@ -83,7 +79,6 @@ void stream_best_block_counts(const test_params &params, std::mutex &mutex, cons
     }
   }
   results[add_count] = block_count;
-
   
   int cur_block_count = block_count;
   int prev_block_count = cur_block_count;

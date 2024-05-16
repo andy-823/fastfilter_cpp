@@ -76,41 +76,42 @@ class XorFuseFilter
     return (FingerprintType)hash;
   }
 
-  explicit XorFuseFilter(const size_t size, int segmentCount_ = 100)
+  explicit XorFuseFilter(const size_t size, int segmentCount_ = -1)
   // explicit XorFuseFilter(const size_t size, const int segmentCount_ = 100)
   {
     h = new HashFamily[4]();
     this->size = size;
-    
-    // harcoding for small values
-    // need segmentCount << segmentLength
-    // while (segmentCount_ * segmentCount_ > 10 * size)
-    // {
-    //   segmentCount_ /= 2;
-    // }
     
     double sizeFactor;
     if (segmentCount_ > 0) // segmentCount has been set
     {
       this->segmentCount = segmentCount_;
       // when segmentCount->inf sizeFactor->1/dencity
-      // sizeFactor = (this->segmentCount + arity - 1) 
-      //                     / (this->segmentCount * this->dencity);
-      sizeFactor = 1 / this->dencity;
+      sizeFactor = (this->segmentCount + arity - 1) 
+                          / (this->segmentCount * this->dencity);
+      // sizeFactor = 1 / this->dencity;
 
       size_t capacity = size * sizeFactor;
       this->segmentLength = (capacity + segmentCount - 1) / segmentCount;
     }
     else // default
     {
-      sizeFactor = fmax(1.075, 0.77 + 0.305 * log(600000) / log(size));
-      this->segmentLength = max(size_t(1), size_t(0.7 * std::pow(size, 0.65))); // 1L << (int)floor(log(size) / log(2.91) - 0.5);
+      this->segmentCount = 0.0015 * pow(size, 0.79);
+      this->segmentCount = std::max(size_t(1), segmentCount);
+      
+      sizeFactor = (this->segmentCount + arity - 1) 
+                          / (this->segmentCount * this->dencity);
 
       size_t capacity = size * sizeFactor;
-      this->segmentCount = (capacity + this->segmentLength - 1) 
-                            / this->segmentLength;
-      this->segmentCount = this->segmentCount <= arity - 1 
-                            ? 1 : this->segmentCount - (arity - 1);
+      this->segmentLength = (capacity + this->segmentCount - 1) / this->segmentCount;
+      // sizeFactor = fmax(1.075, 0.77 + 0.305 * log(600000) / log(size));
+      // this->segmentLength = max(size_t(1), size_t(0.7 * std::pow(size, 0.65))); // 1L << (int)floor(log(size) / log(2.91) - 0.5);
+
+      // size_t capacity = size * sizeFactor;
+      // this->segmentCount = (capacity + this->segmentLength - 1) 
+      //                       / this->segmentLength;
+      // this->segmentCount = this->segmentCount <= arity - 1 
+      //                       ? 1 : this->segmentCount - (arity - 1);
     }
     this->arrayLength = (this->segmentCount + arity - 1) * this->segmentLength;
     this->segmentCountLength = this->segmentCount * this->segmentLength;
@@ -173,9 +174,9 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
   size_t *alone = new size_t[arrayLength];
   hashIndex = 0;
 
-  size_t max_iter = 1;
-  while (max_iter--) 
-  // while (true)
+  // size_t max_iter = 1;
+  // while (max_iter--) 
+  while (true)
   {
     memset(edgeCount, 0, sizeof(uint16_t) * arrayLength);
     memset(edgeXor, 0, sizeof(edge) * arrayLength);

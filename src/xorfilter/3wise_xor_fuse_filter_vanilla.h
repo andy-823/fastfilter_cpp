@@ -95,8 +95,8 @@ class XorFuseFilter
     }
     else // default
     {
-      this->segmentCount = 0.201 * pow(size, 0.43); // 0.4300000000000002 0.201416015625
-      this->segmentCount = std::max(1, segmentCount);
+      this->segmentCount = 0.264 * pow(size, 0.43);
+      this->segmentCount = std::max(size_t(1), segmentCount);
       sizeFactor = (this->segmentCount + arity - 1) 
                           / (this->segmentCount * this->dencity);
 
