@@ -108,7 +108,8 @@ class XorFuseFilter
       else
       {
         size_t capacity = size * sizeFactor;
-        this->segmentLength = (capacity + this->segmentCount - 1) / this->segmentCount;
+        // this->segmentLength = (capacity + this->segmentCount - 1) / this->segmentCount;
+        this->segmentLength = size / (this->dencity * this->segmentCount);
       }
       // sizeFactor = fmax(1.125, 0.875 + 0.25 * log(1000000) / log(size));
       // this->segmentLength = std::max(size_t(1), size_t(4.8 * std::pow(size, 0.58)));
