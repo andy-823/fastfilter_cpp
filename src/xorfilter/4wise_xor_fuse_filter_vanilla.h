@@ -82,40 +82,22 @@ class XorFuseFilter
     h = new HashFamily[4]();
     this->size = size;
     
-    double sizeFactor;
     if (segmentCount_ > 0) // segmentCount has been set
     {
       this->segmentCount = segmentCount_;
-      // when segmentCount->inf sizeFactor->1/dencity
-      sizeFactor = (this->segmentCount + arity - 1) 
-                          / (this->segmentCount * this->dencity);
-      // sizeFactor = 1 / this->dencity;
-
-      size_t capacity = size * sizeFactor;
-      this->segmentLength = (capacity + segmentCount - 1) / segmentCount;
     }
     else // default
     {
-      this->segmentCount = 0.0015 * pow(size, 0.79);
+      this->segmentCount = 0.046 * pow(size, 0.75);
       this->segmentCount = std::max(size_t(1), segmentCount);
-      
-      sizeFactor = (this->segmentCount + arity - 1) 
-                          / (this->segmentCount * this->dencity);
-
-      size_t capacity = size * sizeFactor;
-      this->segmentLength = (capacity + this->segmentCount + arity - 2) 
-                              / (this->segmentCount + arity - 1);
-      // this->segmentLength = (capacity + this->segmentCount - 1) / this->segmentCount;
-      // this->segmentLength = size / (this->dencity * this->segmentCount);
-      // sizeFactor = fmax(1.075, 0.77 + 0.305 * log(600000) / log(size));
-      // this->segmentLength = max(size_t(1), size_t(0.7 * std::pow(size, 0.65))); // 1L << (int)floor(log(size) / log(2.91) - 0.5);
-
-      // size_t capacity = size * sizeFactor;
-      // this->segmentCount = (capacity + this->segmentLength - 1) 
-      //                       / this->segmentLength;
-      // this->segmentCount = this->segmentCount <= arity - 1 
-      //                       ? 1 : this->segmentCount - (arity - 1);
     }
+
+    double sizeFactor = (this->segmentCount + arity - 1) 
+                  / (this->segmentCount * this->dencity);
+    size_t capacity = size * sizeFactor;
+    this->segmentLength = (capacity + this->segmentCount + arity - 2) 
+                            / (this->segmentCount + arity - 1);
+
     this->arrayLength = (this->segmentCount + arity - 1) * this->segmentLength;
     this->segmentCountLength = this->segmentCount * this->segmentLength;
     fingerprints = new FingerprintType[arrayLength]();
