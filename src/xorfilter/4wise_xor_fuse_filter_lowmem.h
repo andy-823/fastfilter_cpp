@@ -290,12 +290,30 @@ template <typename ItemType, typename FingerprintType, typename HashFamily>
 Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::Contain(
     const ItemType &key) const {
   uint64_t hash = (*hasher)(key);
-  // Could manually optimize.
   FingerprintType f = fingerprint(hash);
-  for (int hi = 0; hi < 4; hi++) {
-    size_t h = getHashFromHash(hash, hi);
-    f ^= fingerprints[h];
-  }
+  // Is this thing better??.
+  uint64_t h1 = hash & 65535;
+  uint64_t h2 = (hash >> 16) & 65535;
+  uint64_t h3 = (hash >> 32) & 65535;
+
+  __uint128_t x = (__uint128_t)hash * (__uint128_t)segmentCountLength;
+  uint64_t h0 = (uint64_t)(x >> 64);
+    
+  uint64_t hh = h0 / segmentLength;
+  h1 = (h1 * segmentLength) >> 16;
+  h2 = (h2 * segmentLength) >> 16;
+  h3 = (h3 * segmentLength) >> 16;
+  
+  h1 += (hh + 1) * segmentLength; 
+  h2 += (hh + 2) * segmentLength; 
+  h3 += (hh + 3) * segmentLength; 
+
+  f ^= fingerprints[h0] ^ fingerprints[h1] ^ fingerprints[h2] ^ fingerprints[h3];
+  // FingerprintType f = fingerprint(hash);
+  // for (int hi = 0; hi < 4; hi++) {
+  //   size_t h = getHashFromHash(hash, hi);
+  //   f ^= fingerprints[h];
+  // }
   return f == 0 ? Ok : NotFound;
 }
 
