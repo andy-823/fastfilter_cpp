@@ -5,7 +5,7 @@
 
 
 template <typename Table = xorbinaryfusefilter_lowmem::XorBinaryFuseFilter<
-              uint64_t, uint8_t>>
+              uint64_t, uint16_t>>
 std::pair<double, double>
 one_measure_benchmark_construction(const std::vector<uint64_t> &source,
                                    size_t add_count) {
@@ -40,20 +40,23 @@ void stream_construction_benchmark(size_t start_size, size_t max_size,
   double gap = exp(log(max_size / start_size) / iteration);
   for (double n = start_size; n <= max_size; n *= gap) {
     std::cout << size_t(n) << ",\t";
-    std::pair<double,double> failure_proba = one_measure_benchmark_construction<>(source, size_t(n));
+    std::pair<double,double> failure_proba = one_measure_benchmark_construction<xorfusefilter_lowmem::XorFuseFilter<uint64_t, uint8_t>>(source, size_t(n));
     std::cout << failure_proba.first << "," << failure_proba.second;
     std::cout.flush();
     std::cout << ",\t";
-    failure_proba = one_measure_benchmark_construction<xorbinaryfusefilter_lowmem4wise::XorBinaryFuseFilter<uint64_t, uint8_t>>(source, size_t(n));
+    failure_proba = one_measure_benchmark_construction<xorfusefilter_lowmem4wise::XorFuseFilter<uint64_t, uint8_t>>(source, size_t(n));
     std::cout << failure_proba.first << "," << failure_proba.second;
     std::cout.flush();
-    std::cout << ",\t";
-    failure_proba = one_measure_benchmark_construction<XorFilter<uint64_t, uint8_t, SimpleMixSplit>>(source, size_t(n));
-    std::cout << failure_proba.first << "," << failure_proba.second;
+    // failure_proba = one_measure_benchmark_construction<xorfusefilter_vanilla::XorFuseFilter<uint64_t, uint8_t>>(source, size_t(n));
+    // std::cout << failure_proba.first << "," << failure_proba.second;
+    // std::cout.flush();
+    // std::cout << ",\t";
+    // failure_proba = one_measure_benchmark_construction<XorFilter<uint64_t, uint8_t, SimpleMixSplit>>(source, size_t(n));
+    // std::cout << failure_proba.first << "," << failure_proba.second;
     std::cout << std::endl;
   }
 }
 int main() {
-  stream_construction_benchmark(100, 100'000, 200);
+  stream_construction_benchmark(100, 100'000'000, 100);
   return EXIT_SUCCESS;
 }

@@ -1,0 +1,34 @@
+checking match size...                        generating samples with probability 0 ...                                                                                          generating samples with probability 0.25 ...                                                                                          generating samples with probability 0.5 ...                                                                                          generating samples with probability 0.75 ...                                                                                          generating samples with probability 1 ...                                                                                                                                              find    find    find    find    find  1*add+                       optimal  wasted million
+                                     add  remove      0%     25%     50%     75%    100%  3*find      ε%  bits/item  bits/item  space%    keys
+
+batched add             add    cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.25%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.50%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.75%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+1.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+                 XorBinaryFuse16   67.51    0.00   29.56   32.70   27.60   34.80   32.82  162.01  0.0017      18.01      15.89    13.4 100.000
+
+batched add             add    cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.25%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.50%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.75%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+1.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+           XorBinaryFuse16-4wise   72.23    0.00   43.73   39.50   42.84   35.02   36.00  190.48  0.0016      17.21      15.94     7.9 100.000
+
+batched add             add    cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.25%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.50%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.75%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+1.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+                       XorFuse16   82.76    0.00   34.17   33.47   42.02   37.41   32.01  190.21  0.0014      17.58      16.10     9.2 100.000
+
+batched add             add    cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.25%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.50%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+0.75%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+1.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
+                 XorFuse16-4wise   54.62    0.00   50.34   47.44   39.98   52.92   38.31  192.01  0.0016      16.69      15.94     4.7 100.000

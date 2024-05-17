@@ -147,10 +147,10 @@ int main(int argc, char * argv[])
   std::mutex output_mutex;
   std::thread t1(stream_best_block_counts<xorfusefilter_vanilla::XorFuseFilter<uint64_t, uint8_t>>, 
                 std::ref(params), std::ref(output_mutex), "xorfusefilter_vanilla");
+  t1.join();
+  
   std::thread t2(stream_best_block_counts<xorfusefilter_vanilla4wise::XorFuseFilter<uint64_t, uint8_t>>, 
                 std::ref(params), std::ref(output_mutex), "xorfusefilter_vanilla4wise");
-
-  t1.join();
   t2.join();
 
   return EXIT_SUCCESS;
