@@ -146,7 +146,6 @@ Status XorBinaryFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
     size_t block = size_t(1) << blockBits;
     size_t *startPos = new size_t[block];
     for(uint32_t i = 0; i < uint32_t(1) << blockBits; i++) { startPos[i] = i * size / block; }
-    cout << "12\n";
     for (size_t i = start; i < end; i++) {
       uint64_t k = keys[i];
       uint64_t hash = (*hasher)(k);
@@ -160,7 +159,6 @@ Status XorBinaryFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
       reverseOrder[startPos[segment_index]] = hash;
       startPos[segment_index]++;
     }
-    cout << "123\n";
     uint8_t countMask = 0;
     for (size_t i = 0; i < size; i++) {
       uint64_t hash = reverseOrder[i];

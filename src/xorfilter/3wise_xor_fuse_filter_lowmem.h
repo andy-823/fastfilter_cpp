@@ -56,7 +56,7 @@ public:
   size_t hashIndex{0};
 
   inline FingerprintType fingerprint(const uint64_t hash) const {
-    return (FingerprintType)hash;
+    return (FingerprintType)hash ^ (hash >> 32);
   }
 
   inline __attribute__((always_inline)) size_t getHashFromHash(uint64_t hash,
@@ -73,6 +73,7 @@ public:
 
   explicit XorFuseFilter(const size_t size) {
     hasher = new HashFamily();
+    this->size = size;
     // max segment size is 2**18
     // but it's not gonna be reached if you use size <= 3 * 10^8
     // work stability at sizes > 10^8 wasn't checked
@@ -144,7 +145,6 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
   
   // the array h0, h1, h2, h0, h1, h2
   size_t h012[5];
-
   while (true) {
     memset(t2count, 0, sizeof(uint8_t) * arrayLength);
     memset(t2hash, 0, sizeof(uint64_t) * arrayLength);
@@ -157,22 +157,20 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
     int blockBits = 1;
     while((size_t(1)<<blockBits) < segmentCount) { blockBits++; }
     size_t block = size_t(1) << blockBits;
+
     size_t *startPos = new size_t[block];
-    cout << block << " " << blockBits << " " << segmentCount << "\n";;
-    for(uint32_t i = 0; i < uint32_t(1) << blockBits; i++) { startPos[i] = i * size / block; }
+    for(uint32_t i = 0; i < block; i++) { startPos[i] = i * size / block; }
     for (size_t i = start; i < end; i++) {
       uint64_t k = keys[i];
       uint64_t hash = (*hasher)(k);
       size_t segment_index = hash >> (64 - blockBits);
       while(reverseOrder[startPos[segment_index]] != 0) {
-        cout << reverseOrder[startPos[segment_index]] << "\n";
         segment_index++;
         segment_index &= (size_t(1) << blockBits) - 1;
       }
       reverseOrder[startPos[segment_index]] = hash;
       startPos[segment_index]++;
     }
-    cout << "123\n";
     uint8_t countMask = 0;
     for (size_t i = 0; i < size; i++) {
       uint64_t hash = reverseOrder[i];
@@ -199,7 +197,6 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
         countMask |= t2count[index];
       }
     }
-    cout << "1234\n";
     delete[] startPos;
     if (countMask >= 0x80) {
       // we have a possible counter overflow
