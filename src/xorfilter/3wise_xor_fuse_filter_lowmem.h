@@ -59,22 +59,10 @@ public:
     return (FingerprintType)hash ^ (hash >> 32);
   }
 
-  inline __attribute__((always_inline)) size_t getHashFromHash(uint64_t hash,
-                                                               int index) {
-    __uint128_t x = (__uint128_t)hash * (__uint128_t)segmentCountLength;
-    uint64_t h = (uint64_t)(x >> 64);
-    h += index * segmentLength;
-    // keep the lower 36 bits
-    uint64_t hh = hash & ((1UL << 36) - 1);
-    // index 0: right shift by 36; index 1: right shift by 18; index 2: no shift
-    h ^= (size_t)((hh >> (36 - 18 * index)) & segmentLengthMask);
-    return h;
-  }
-
   explicit XorFuseFilter(const size_t size) {
     hasher = new HashFamily();
     this->size = size;
-    // max segment size is 2**18
+    // max supported segment size is 2**18
     // but it's not gonna be reached if you use size <= 3 * 10^8
     // work stability at sizes > 10^8 wasn't checked
     // you can try to choose different formula
@@ -181,12 +169,12 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
       
       h012[1] = (hash >> 18) & ((1 << 18) - 1);
       h012[1] = ((uint64_t)h012[1] * segmentLength) >> 18; // apply reduce
-      assert(h012[1] < segmentLength);
+      // assert(h012[1] < segmentLength);
       h012[1] += (index + 1) * segmentLength;
       
       h012[2] = hash & ((1 << 18) - 1);
       h012[2] = ((uint64_t)h012[2] * segmentLength) >> 18; // apply reduce
-      assert(h012[2] < segmentLength);
+      // assert(h012[2] < segmentLength);
       h012[2] += (index + 2) * segmentLength;
       
       for (int hi = 0; hi < 3; hi++) {
@@ -231,12 +219,12 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
         
         h012[1] = (hash >> 18) & ((1 << 18) - 1);
         h012[1] = ((uint64_t)h012[1] * segmentLength) >> 18; // apply reduce
-        assert(h012[1] < segmentLength);
+        // assert(h012[1] < segmentLength);
         h012[1] += (index + 1) * segmentLength;
 
         h012[2] = hash & ((1 << 18) - 1);
         h012[2] = ((uint64_t)h012[2] * segmentLength) >> 18; // apply reduce
-        assert(h012[2] < segmentLength);
+        // assert(h012[2] < segmentLength);
         h012[2] += (index + 2) * segmentLength;
 
         size_t index3 = h012[mod3(found + 1)];

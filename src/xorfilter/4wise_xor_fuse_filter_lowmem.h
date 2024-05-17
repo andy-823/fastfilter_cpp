@@ -1,11 +1,15 @@
-#ifndef FOURWISE_XOR_BINARY_FUSE_FILTER_XOR_FILTER_LOWMEM_H_
-#define FOURWISE_XOR_BINARY_FUSE_FILTER_XOR_FILTER_LOWMEM_H_
-#include "xor_binary_fuse_filter.h"
+#ifndef FOURWISE_XOR_FUSE_FILTER_XOR_FILTER_LOWMEM_H_
+#define FOURWISE_XOR_FUSE_FILTER_XOR_FILTER_LOWMEM_H_
+#include "xor_fuse_filter.h"
 /**
  * As of July 2021, the lowmem versions of the binary fuse filters are
  * the recommended defaults.
  */
-namespace xorbinaryfusefilter_lowmem4wise {
+
+/*
+ * Modified in May 2024 
+ */
+namespace xorfusefilter_lowmem4wise {
 // status returned by a xor filter operation
 enum Status {
   Ok = 0,
@@ -22,7 +26,7 @@ __attribute__((always_inline)) inline uint32_t reduce(uint32_t hash,
 
 template <typename ItemType, typename FingerprintType,
           typename HashFamily = SimpleMixSplit>
-class XorBinaryFuseFilter {
+class XorFuseFilter {
 public:
   size_t size;
   size_t arrayLength;
@@ -31,13 +35,19 @@ public:
   size_t segmentLength;
   size_t segmentLengthMask;
   static constexpr size_t arity = 4;
+  /* Taken from
+   * Martin Dietzfelbinger and Stefan Walzer. 2019.
+   * Dense Peelable Random Uniform Hypergraphs.
+   * In 27th Annual European Symposium on Algorithms (ESA 2019)
+   */
+  static constexpr double dencity = 0.96; // threshold is 0.97677
   FingerprintType *fingerprints;
 
   HashFamily *hasher;
   size_t hashIndex{0};
 
   inline FingerprintType fingerprint(const uint64_t hash) const {
-    return (FingerprintType)hash;
+    return (FingerprintType)hash ^ (hash >> 32);
   }
 
   static inline __attribute__((always_inline)) uint64_t rotateLeft(uint64_t n,
@@ -58,40 +68,39 @@ public:
   getHashFromHash(uint64_t hash, int index) const {
     __uint128_t x = (__uint128_t)hash * (__uint128_t)segmentCountLength;
     uint64_t h = (uint64_t)(x >> 64);
-    h += index * segmentLength;
-    uint64_t hh = hash;
-    if (index > 0) {
-        h ^= hh >> ((index - 1) * 16) & segmentLengthMask;
+    if (index > 0)
+    {
+      uint64_t hh = h / segmentLength;
+      h = (hash >> ((index - 1) * 16)) & 65535;
+      h = (h * segmentLength) >> 16; // apply reduce
+      h += (hh + index) * segmentLength;
     }
     return h;
   }
 
-  explicit XorBinaryFuseFilter(const size_t size) {
+  explicit XorFuseFilter(const size_t size) {
     hasher = new HashFamily();
     this->size = size;
-    this->segmentLength = calculateSegmentLength(arity, size);
-    // the current implementation hardcodes a 16-bit limit to
-    // to the segment length.
-    if (this->segmentLength > (1 << 18)) {
-      this->segmentLength = (1 << 18);
-    }
-    double sizeFactor = calculateSizeFactor(arity, size);
+    // the current implementation uses a 16-bit limit to
+    // to the segment length, but its not a problem with this furmula
+    // anyway other problems can be because
+    // constuction stability wasnt checked at size > 10^8
+    this->segmentCount = 0.003 * pow(size, 0.77);
+    this->segmentCount = std::max(size_t(1), segmentCount);
+
+    double sizeFactor = (this->segmentCount + arity - 1) 
+                  / (this->segmentCount * this->dencity);
     size_t capacity = size * sizeFactor;
-    size_t segmentCount =
-        (capacity + segmentLength - 1) / segmentLength - (arity - 1);
-    this->arrayLength = (segmentCount + arity - 1) * segmentLength;
-    this->segmentLengthMask = this->segmentLength - 1;
-    this->segmentCount =
-        (this->arrayLength + this->segmentLength - 1) / this->segmentLength;
-    this->segmentCount =
-        this->segmentCount <= arity - 1 ? 1 : this->segmentCount - (arity - 1);
+    this->segmentLength = (capacity + this->segmentCount - 1) 
+                            / this->segmentCount;
+
     this->arrayLength = (this->segmentCount + arity - 1) * this->segmentLength;
     this->segmentCountLength = this->segmentCount * this->segmentLength;
     fingerprints = new FingerprintType[arrayLength]();
     std::fill_n(fingerprints, arrayLength, 0);
   }
 
-  ~XorBinaryFuseFilter() {
+  ~XorFuseFilter() {
     delete[] fingerprints;
     delete hasher;
   }
@@ -118,7 +127,7 @@ public:
 };
 
 template <typename ItemType, typename FingerprintType, typename HashFamily>
-Status XorBinaryFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
+Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
     const ItemType *keys, const size_t start, const size_t end) {
 
   uint64_t *reverseOrder = new uint64_t[size+1];
@@ -278,7 +287,7 @@ Status XorBinaryFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
 }
 
 template <typename ItemType, typename FingerprintType, typename HashFamily>
-Status XorBinaryFuseFilter<ItemType, FingerprintType, HashFamily>::Contain(
+Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::Contain(
     const ItemType &key) const {
   uint64_t hash = (*hasher)(key);
   // Could manually optimize.
@@ -292,11 +301,11 @@ Status XorBinaryFuseFilter<ItemType, FingerprintType, HashFamily>::Contain(
 
 template <typename ItemType, typename FingerprintType, typename HashFamily>
 std::string
-XorBinaryFuseFilter<ItemType, FingerprintType, HashFamily>::Info() const {
+XorFuseFilter<ItemType, FingerprintType, HashFamily>::Info() const {
   std::stringstream ss;
-  ss << "4-wise XorBinaryFuseFilter Status:\n"
+  ss << "4-wise XorFuseFilter Status:\n"
      << "\t\tKeys stored: " << Size() << "\n";
   return ss.str();
 }
-} // namespace xorbinaryfusefilter_lowmem4wise
+} // namespace xorfusefilter_lowmem4wise
 #endif

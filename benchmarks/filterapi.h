@@ -891,6 +891,30 @@ struct FilterAPI<xorfusefilter_lowmem::XorFuseFilter<
 };
 
 template <typename ItemType, typename FingerprintType>
+struct FilterAPI<xorfusefilter_lowmem4wise::XorFuseFilter<
+    ItemType, FingerprintType>> {
+  using Table =
+      xorfusefilter_lowmem4wise::XorFuseFilter<ItemType,
+                                                      FingerprintType>;
+  static Table ConstructFromAddCount(size_t add_count) {
+    return Table(add_count);
+  }
+  static void Add(uint64_t, Table *) {
+    throw std::runtime_error("Unsupported");
+  }
+  static void AddAll(const vector<ItemType> &keys, const size_t start,
+                     const size_t end, Table *table) {
+    table->AddAll(keys, start, end);
+  }
+  static void Remove(uint64_t, Table *) {
+    throw std::runtime_error("Unsupported");
+  }
+  CONTAIN_ATTRIBUTES static bool Contain(uint64_t key, const Table *table) {
+    return (0 == table->Contain(key));
+  }
+};
+
+template <typename ItemType, typename FingerprintType>
 struct FilterAPI<xorbinaryfusefilter_naive4wise::XorBinaryFuseFilter<
     ItemType, FingerprintType>> {
   using Table =
