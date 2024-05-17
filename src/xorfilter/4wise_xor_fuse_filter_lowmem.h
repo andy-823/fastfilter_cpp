@@ -24,6 +24,13 @@ __attribute__((always_inline)) inline uint32_t reduce(uint32_t hash,
   return (uint32_t)(((uint64_t)hash * n) >> 32);
 }
 
+__attribute__((always_inline)) inline uint64_t reduce(uint64_t hash,
+                                                      uint32_t n)
+{
+  // http://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
+  return (uint64_t)(((__uint128_t)hash * n) >> 64);
+}
+
 template <typename ItemType, typename FingerprintType,
           typename HashFamily = SimpleMixSplit>
 class XorFuseFilter {
@@ -71,8 +78,10 @@ public:
     if (index > 0)
     {
       uint64_t hh = h / segmentLength;
-      h = (hash >> ((index - 1) * 16)) & 65535;
-      h = (h * segmentLength) >> 16; // apply reduce
+      // h = (hash >> ((index - 1) * 16)) & 65535;
+      // h = (h * segmentLength) >> 16; // apply reduce
+      h = rotateLeft(hash, index * 16);
+      h = reduce(h, segmentLength);
       h += (hh + index) * segmentLength;
     }
     return h;
@@ -81,9 +90,7 @@ public:
   explicit XorFuseFilter(const size_t size) {
     hasher = new HashFamily();
     this->size = size;
-    // the current implementation uses a 16-bit limit to
-    // to the segment length, but its not a problem with this furmula
-    // anyway other problems can be because
+
     // constuction stability wasnt checked at size > 10^8
     this->segmentCount = 0.003 * pow(size, 0.77);
     this->segmentCount = std::max(size_t(1), segmentCount);
@@ -157,6 +164,7 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
   hi0123[6] = 2;
 
   while (true) {
+    // cout << "attempt\n";
     memset(t2count, 0, sizeof(uint8_t) * arrayLength);
     memset(t2hash, 0, sizeof(uint64_t) * arrayLength);
 
@@ -291,19 +299,25 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::Contain(
     const ItemType &key) const {
   uint64_t hash = (*hasher)(key);
   FingerprintType f = fingerprint(hash);
-  // Is this thing better??.
-  uint64_t h1 = hash & 65535;
-  uint64_t h2 = (hash >> 16) & 65535;
-  uint64_t h3 = (hash >> 32) & 65535;
+  // Is this thing.
+  // uint64_t h1 = hash;
+  // uint64_t h2 = (hash >> 16) & 65535;
+  // uint64_t h3 = (hash >> 32) & 65535;
+  uint64_t h1 = rotateLeft(hash, 16);
+  uint64_t h2 = rotateLeft(hash, 32);
+  uint64_t h3 = rotateLeft(hash, 48);
 
   __uint128_t x = (__uint128_t)hash * (__uint128_t)segmentCountLength;
   uint64_t h0 = (uint64_t)(x >> 64);
     
   uint64_t hh = h0 / segmentLength;
-  h1 = (h1 * segmentLength) >> 16;
-  h2 = (h2 * segmentLength) >> 16;
-  h3 = (h3 * segmentLength) >> 16;
-  
+  // h1 = (h1 * segmentLength) >> 16;
+  // h2 = (h2 * segmentLength) >> 16;
+  // h3 = (h3 * segmentLength) >> 16;
+  h1 = reduce(h1, segmentLength);
+  h2 = reduce(h2, segmentLength);
+  h3 = reduce(h3, segmentLength);
+
   h1 += (hh + 1) * segmentLength; 
   h2 += (hh + 2) * segmentLength; 
   h3 += (hh + 3) * segmentLength; 

@@ -79,9 +79,8 @@ public:
   explicit XorFuseFilter(const size_t size) {
     hasher = new HashFamily();
     this->size = size;
-    // max supported segment size is 2**18
-    // but it's not gonna be reached if you use size <= 3 * 10^8
-    // work stability at sizes > 10^8 wasn't checked
+
+    // construction stability at sizes > 10^8 wasn't checked
     // you can try to choose different formula
     
     this->segmentCount = 0.216 * pow(size, 0.44);
@@ -153,6 +152,7 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
   // the array h0, h1, h2, h0, h1, h2
   size_t h012[5];
   while (true) {
+    // cout << "attempt\n";
     memset(t2count, 0, sizeof(uint8_t) * arrayLength);
     memset(t2hash, 0, sizeof(uint64_t) * arrayLength);
 
