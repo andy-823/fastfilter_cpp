@@ -1,6 +1,7 @@
 #ifndef THREEWISE_XOR_FUSE_FILTER_XOR_FILTER_VANILLA_H_
 #define THREEWISE_XOR_FUSE_FILTER_XOR_FILTER_VANILLA_H_
-#include "xor_binary_fuse_filter.h"
+
+#include "xor_fuse_filter.h"
 
 /**
  * This is vanilla verion of xor fuse filter

@@ -406,6 +406,7 @@ int main(int argc, char * argv[]) {
 
     {217, "XorFuse16-vanilla"},
     {219, "XorFuse16-vanilla-4wise"},
+    {227, "XorFuse16"},
 
 
     {1056, "HomogRibbon64_5"},
@@ -1035,6 +1036,14 @@ int main(int argc, char * argv[]) {
           add_count, to_add, intersectionsize, mixed_sets,  true);
       cout << setw(NAME_WIDTH) << names[a] << cf << endl;
   }
+  a = 227;
+  if (algorithmId == a || algorithmId < 0 || (algos.find(a) != algos.end())) {
+      auto cf = FilterBenchmark<
+          xorfusefilter_lowmem::XorFuseFilter<uint64_t, uint16_t>>(
+          add_count, to_add, intersectionsize, mixed_sets,  true);
+      cout << setw(NAME_WIDTH) << names[a] << cf << endl;
+  }
+
    // Homogeneous Ribbon
   a = 1056;
   if (algorithmId == a || (algos.find(a) != algos.end())) {

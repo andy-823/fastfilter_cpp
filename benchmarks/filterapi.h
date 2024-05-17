@@ -8,10 +8,9 @@
 #include <stdio.h>
 #include <vector>
 
-// morton
-#include "3wise_xor_fuse_filter_vanilla.h"
-#include "4wise_xor_fuse_filter_vanilla.h"
+#include "xor_fuse_filter.h"
 
+// morton
 #include "binaryfusefilter_singleheader.h"
 #include "bloom.h"
 #include "compressed_cuckoo_filter.h"
@@ -867,6 +866,29 @@ struct FilterAPI<xorfusefilter_vanilla4wise::XorFuseFilter<
   }
 };
 
+template <typename ItemType, typename FingerprintType>
+struct FilterAPI<xorfusefilter_lowmem::XorFuseFilter<
+    ItemType, FingerprintType>> {
+  using Table =
+      xorfusefilter_lowmem::XorFuseFilter<ItemType,
+                                                      FingerprintType>;
+  static Table ConstructFromAddCount(size_t add_count) {
+    return Table(add_count);
+  }
+  static void Add(uint64_t, Table *) {
+    throw std::runtime_error("Unsupported");
+  }
+  static void AddAll(const vector<ItemType> &keys, const size_t start,
+                     const size_t end, Table *table) {
+    table->AddAll(keys, start, end);
+  }
+  static void Remove(uint64_t, Table *) {
+    throw std::runtime_error("Unsupported");
+  }
+  CONTAIN_ATTRIBUTES static bool Contain(uint64_t key, const Table *table) {
+    return (0 == table->Contain(key));
+  }
+};
 
 template <typename ItemType, typename FingerprintType>
 struct FilterAPI<xorbinaryfusefilter_naive4wise::XorBinaryFuseFilter<
