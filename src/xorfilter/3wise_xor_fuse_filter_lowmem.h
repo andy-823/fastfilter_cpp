@@ -26,11 +26,28 @@ __attribute__((always_inline)) inline uint32_t reduce(uint32_t hash,
   return (uint32_t)(((uint64_t)hash * n) >> 32);
 }
 
+// for 64-bit integers
+__attribute__((always_inline)) inline uint64_t reduce(uint64_t hash,
+                                                      uint32_t n)
+{
+  // http://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
+  return (uint64_t)(((__uint128_t)hash * n) >> 64);
+}
+
 __attribute__((always_inline)) inline uint8_t mod3(uint8_t x) {
     if (x > 2) {
         x -= 3;
     }
     return x;
+}
+
+__attribute__((always_inline))
+inline uint64_t rotl64(uint64_t n, unsigned int c) {
+    // assumes width is a power of 2
+    const unsigned int mask = (CHAR_BIT * sizeof(n) - 1);
+    // assert ( (c<=mask) &&"rotate by type width or more");
+    c &= mask;
+    return (n << c) | ( n >> ((-c) & mask));
 }
 
 template <typename ItemType, typename FingerprintType,
@@ -66,7 +83,9 @@ public:
     // but it's not gonna be reached if you use size <= 3 * 10^8
     // work stability at sizes > 10^8 wasn't checked
     // you can try to choose different formula
+    
     this->segmentCount = 0.216 * pow(size, 0.44);
+    // this->segmentCount = 0.072 * pow(size, 0.44);
     this->segmentCount = std::max(size_t(1), segmentCount);
 
     double sizeFactor = (this->segmentCount + arity - 1) 
@@ -159,23 +178,17 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
       reverseOrder[startPos[segment_index]] = hash;
       startPos[segment_index]++;
     }
+    
     uint8_t countMask = 0;
     for (size_t i = 0; i < size; i++) {
       uint64_t hash = reverseOrder[i];
-      __uint128_t x = (__uint128_t)hash * (__uint128_t)segmentCountLength;
-      h012[0] = (uint64_t)(x >> 64);
-      assert(h012[0] < segmentCountLength);
+
+      h012[0] = (size_t) reduce(hash, segmentCountLength);
       size_t index = h012[0] / segmentLength;
-      
-      h012[1] = (hash >> 18) & ((1 << 18) - 1);
-      h012[1] = ((uint64_t)h012[1] * segmentLength) >> 18; // apply reduce
-      // assert(h012[1] < segmentLength);
-      h012[1] += (index + 1) * segmentLength;
-      
-      h012[2] = hash & ((1 << 18) - 1);
-      h012[2] = ((uint64_t)h012[2] * segmentLength) >> 18; // apply reduce
-      // assert(h012[2] < segmentLength);
-      h012[2] += (index + 2) * segmentLength;
+      h012[1] = (size_t) rotl64(hash, 21);
+      h012[2] = (size_t) rotl64(hash, 42);
+      h012[1] = reduce(h012[1], segmentLength) + (index + 1) * segmentLength;
+      h012[2] = reduce(h012[2], segmentLength) + (index + 2) * segmentLength;
       
       for (int hi = 0; hi < 3; hi++) {
         index = h012[hi];
@@ -212,20 +225,13 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
         
         reverseH[reverseOrderPos] = found;
         reverseOrder[reverseOrderPos] = hash;
-        
-        __uint128_t x = (__uint128_t)hash * (__uint128_t)segmentCountLength;
-        h012[0] = (uint64_t)(x >> 64);
-        index = h012[0] / segmentLength;
-        
-        h012[1] = (hash >> 18) & ((1 << 18) - 1);
-        h012[1] = ((uint64_t)h012[1] * segmentLength) >> 18; // apply reduce
-        // assert(h012[1] < segmentLength);
-        h012[1] += (index + 1) * segmentLength;
 
-        h012[2] = hash & ((1 << 18) - 1);
-        h012[2] = ((uint64_t)h012[2] * segmentLength) >> 18; // apply reduce
-        // assert(h012[2] < segmentLength);
-        h012[2] += (index + 2) * segmentLength;
+        h012[0] = (size_t) reduce(hash, segmentCountLength);
+        size_t index = h012[0] / segmentLength;
+        h012[1] = (size_t) rotl64(hash, 21);
+        h012[2] = (size_t) rotl64(hash, 42);
+        h012[1] = reduce(h012[1], segmentLength) + (index + 1) * segmentLength;
+        h012[2] = reduce(h012[2], segmentLength) + (index + 2) * segmentLength;
 
         size_t index3 = h012[mod3(found + 1)];
         alone[alonePos] = index3;
@@ -263,17 +269,12 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
     int found = reverseH[i];
     FingerprintType xor2 = fingerprint(hash);
 
-    __uint128_t x = (__uint128_t)hash * (__uint128_t)segmentCountLength;
-    h012[0] = (uint64_t)(x >> 64);
+    h012[0] = (size_t) reduce(hash, segmentCountLength);
     size_t index = h012[0] / segmentLength;
-    
-    h012[1] = (hash >> 18) & ((1 << 18) - 1);
-    h012[1] = ((uint64_t)h012[1] * segmentLength) >> 18; // apply reduce
-    h012[1] += (index + 1) * segmentLength;
-    
-    h012[2] = hash & ((1 << 18) - 1);
-    h012[2] = ((uint64_t)h012[2] * segmentLength) >> 18; // apply reduce
-    h012[2] += (index + 2) * segmentLength;
+    h012[1] = (size_t) rotl64(hash, 21);
+    h012[2] = (size_t) rotl64(hash, 42);
+    h012[1] = reduce(h012[1], segmentLength) + (index + 1) * segmentLength;
+    h012[2] = reduce(h012[2], segmentLength) + (index + 2) * segmentLength;
 
     h012[3] = h012[0];
     h012[4] = h012[1];
@@ -290,18 +291,13 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::Contain(
     const ItemType &key) const {
   uint64_t hash = (*hasher)(key);
   FingerprintType f = fingerprint(hash);
-  __uint128_t x = (__uint128_t)hash * (__uint128_t)segmentCountLength;
-  
-  uint64_t hh = hash;
-  uint64_t h0 = (uint64_t)(x >> 64);
-  int index = h0 / segmentLength;
-  uint64_t h1 = (hh >> 18) & ((1 << 18) - 1);
-  uint64_t h2 = hh & ((1 << 18) - 1);
 
-  h1 = (h1 * segmentLength) >> 18; // apply reduce
-  h1 += (index + 1) * segmentLength;
-  h2 = (h2 * segmentLength) >> 18; // apply reduce
-  h2 += (index + 2) * segmentLength;
+  size_t h0 = (size_t) reduce(hash, segmentCountLength);
+  size_t index = h0 / segmentLength;
+  size_t h1 = (size_t) rotl64(hash, 21);
+  size_t h2 = (size_t) rotl64(hash, 42);
+  h1 = reduce(h1, segmentLength) + (index + 1) * segmentLength;
+  h2 = reduce(h2, segmentLength) + (index + 2) * segmentLength;
 
   f ^= fingerprints[h0] ^ fingerprints[h1] ^ fingerprints[h2];
   return f == 0 ? Ok : NotFound;
