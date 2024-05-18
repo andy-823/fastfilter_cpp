@@ -1,8 +1,8 @@
 
 
 # Uncomment one of the following to switch between debug and opt mode
-# OPT = -O3 -DNDEBUG -std=c++17
-OPT = -O3 -std=c++17 -g -ggdb -fno-omit-frame-pointer -Wextra -fpermissive # -fsanitize=undefined -fsanitize=address
+OPT = -O3 -DNDEBUG -std=c++17
+# OPT = -O3 -std=c++17 -g -ggdb -fno-omit-frame-pointer -Wextra -fpermissive # -fsanitize=undefined -fsanitize=address
 
 CXXFLAGS += -fno-strict-aliasing -Wall -std=c++11 -I. -I../src/ \
     -I../src/bloom/ -I../src/cuckoo/ -I../src/gcs \

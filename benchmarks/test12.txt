@@ -7,7 +7,7 @@ batched add             add    cycles:   0.0/key, instructions: (  0.0/key, -n
 0.50%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
 0.75%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
 1.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
-                 XorBinaryFuse16   67.51    0.00   29.56   32.70   27.60   34.80   32.82  162.01  0.0017      18.01      15.89    13.4 100.000
+                 XorBinaryFuse16   64.47    0.00   28.61   30.50   27.70   26.30   26.23  148.07  0.0015      18.01      16.01    12.6 100.000
 
 batched add             add    cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
 0.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
@@ -15,7 +15,7 @@ batched add             add    cycles:   0.0/key, instructions: (  0.0/key, -n
 0.50%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
 0.75%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
 1.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
-           XorBinaryFuse16-4wise   72.23    0.00   43.73   39.50   42.84   35.02   36.00  190.48  0.0016      17.21      15.94     7.9 100.000
+           XorBinaryFuse16-4wise   67.73    0.00   36.88   37.67   38.49   41.52   38.16  183.36  0.0016      17.21      15.92     8.1 100.000
 
 batched add             add    cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
 0.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
@@ -23,7 +23,7 @@ batched add             add    cycles:   0.0/key, instructions: (  0.0/key, -n
 0.50%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
 0.75%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
 1.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
-                       XorFuse16   82.76    0.00   34.17   33.47   42.02   37.41   32.01  190.21  0.0014      17.58      16.10     9.2 100.000
+                       XorFuse16   78.91    0.00   27.80   26.54   28.04   31.49   31.40  166.07  0.0016      17.58      15.97    10.1 100.000
 
 batched add             add    cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
 0.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
@@ -31,4 +31,4 @@ batched add             add    cycles:   0.0/key, instructions: (  0.0/key, -n
 0.50%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
 0.75%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
 1.00%  cycles:   0.0/key, instructions: (  0.0/key, -nan/cycle) cache misses:  0.00/key branch misses: 0.00/key effective frequency 0.00 GHz
-                 XorFuse16-4wise   54.62    0.00   50.34   47.44   39.98   52.92   38.31  192.01  0.0016      16.69      15.94     4.7 100.000
+                 XorFuse16-4wise   51.33    0.00   34.62   40.30   37.56   36.97   39.86  164.92  0.0013      16.69      16.21     3.0 100.000
