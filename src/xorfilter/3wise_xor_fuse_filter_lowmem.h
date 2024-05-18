@@ -185,7 +185,7 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
 
       h012[0] = (size_t) reduce(hash, segmentCountLength);
       size_t index = h012[0] / segmentLength;
-      h012[1] = (size_t) rotl64(hash, 21);
+      h012[1] = (size_t) rotl64(hash, 24);
       h012[2] = (size_t) rotl64(hash, 42);
       h012[1] = reduce(h012[1], segmentLength) + (index + 1) * segmentLength;
       h012[2] = reduce(h012[2], segmentLength) + (index + 2) * segmentLength;
@@ -228,7 +228,7 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
 
         h012[0] = (size_t) reduce(hash, segmentCountLength);
         size_t index = h012[0] / segmentLength;
-        h012[1] = (size_t) rotl64(hash, 21);
+        h012[1] = (size_t) rotl64(hash, 24);
         h012[2] = (size_t) rotl64(hash, 42);
         h012[1] = reduce(h012[1], segmentLength) + (index + 1) * segmentLength;
         h012[2] = reduce(h012[2], segmentLength) + (index + 2) * segmentLength;
@@ -271,7 +271,7 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
 
     h012[0] = (size_t) reduce(hash, segmentCountLength);
     size_t index = h012[0] / segmentLength;
-    h012[1] = (size_t) rotl64(hash, 21);
+    h012[1] = (size_t) rotl64(hash, 24);
     h012[2] = (size_t) rotl64(hash, 42);
     h012[1] = reduce(h012[1], segmentLength) + (index + 1) * segmentLength;
     h012[2] = reduce(h012[2], segmentLength) + (index + 2) * segmentLength;
@@ -294,7 +294,7 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::Contain(
 
   size_t h0 = (size_t) reduce(hash, segmentCountLength);
   size_t index = h0 / segmentLength;
-  size_t h1 = (size_t) rotl64(hash, 21);
+  size_t h1 = (size_t) rotl64(hash, 24);
   size_t h2 = (size_t) rotl64(hash, 42);
   h1 = reduce(h1, segmentLength) + (index + 1) * segmentLength;
   h2 = reduce(h2, segmentLength) + (index + 2) * segmentLength;
