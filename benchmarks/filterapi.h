@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "xor_fuse_filter.h"
+#include "cuckoofilter_ar.h"
 
 // morton
 #include "binaryfusefilter_singleheader.h"
@@ -113,6 +114,33 @@ struct FilterAPI<
     return (0 == table->Contain(key));
   }
 };
+
+template <typename ItemType, size_t bits_per_item,
+          template <size_t> class TableType, typename HashFamily>
+struct FilterAPI<
+    CuckooFilterAr<ItemType, bits_per_item, TableType, HashFamily>> {
+  using Table =
+      CuckooFilterAr<ItemType, bits_per_item, TableType, HashFamily>;
+  static Table ConstructFromAddCount(size_t add_count) {
+    return Table(add_count);
+  }
+  static void Add(uint64_t key, Table *table) {
+    if (0 != table->Add(key)) {
+      throw logic_error("The filter is too small to hold all of the elements");
+    }
+  }
+  static void AddAll(const vector<uint64_t> &keys, const size_t start,
+                     const size_t end, Table *table) {
+    for (size_t i = start; i < end; i++) {
+      Add(keys[i], table);
+    }
+  }
+  static void Remove(uint64_t key, Table *table) { table->Delete(key); }
+  CONTAIN_ATTRIBUTES static bool Contain(uint64_t key, const Table *table) {
+    return (0 == table->Contain(key));
+  }
+};
+
 
 template <typename ItemType, typename FingerprintType>
 struct FilterAPI<CuckooFuseFilter<ItemType, FingerprintType>> {

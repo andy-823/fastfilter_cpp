@@ -353,6 +353,10 @@ int main(int argc, char * argv[]) {
     {17, "CuckooSemiSort13-2^n"},
     {18, "CuckooFuse8"},
     {19, "CuckooFuse16"},
+
+    {91, "CuckooAr8"},
+    {92, "CuckooAr16"},
+
     // GCS
     {20,"GCS"},
 #ifdef __AVX2__
@@ -406,7 +410,9 @@ int main(int argc, char * argv[]) {
 
     {217, "XorFuse16-vanilla"},
     {219, "XorFuse16-vanilla-4wise"},
+    {226, "XorFuse8"},
     {227, "XorFuse16"},
+    {228, "XorFuse-4wise"},
     {229, "XorFuse16-4wise"},
 
     {1056, "HomogRibbon64_5"},
@@ -728,6 +734,23 @@ int main(int argc, char * argv[]) {
           add_count, to_add, intersectionsize, mixed_sets,  false, true);
       cout << setw(NAME_WIDTH) << names[a] << cf << endl;
   }
+
+  a = 91;
+  if (algorithmId == a || (algos.find(a) != algos.end())) {
+      auto cf = FilterBenchmark<
+          CuckooFilterAr<uint64_t, 8, SingleTable, SimpleMixSplit>>(
+          add_count, to_add, intersectionsize, mixed_sets,  false, true);
+      cout << setw(NAME_WIDTH) << names[a] << cf << endl;
+  }
+
+  a = 92;
+  if (algorithmId == a || (algos.find(a) != algos.end())) {
+      auto cf = FilterBenchmark<
+          CuckooFilterAr<uint64_t, 16, SingleTable, SimpleMixSplit>>(
+          add_count, to_add, intersectionsize, mixed_sets,  false, true);
+      cout << setw(NAME_WIDTH) << names[a] << cf << endl;
+  }
+
   // GCS ----------------------------------------------------------
   a = 20;
   if (algorithmId == a || (algos.find(a) != algos.end())) {
@@ -1036,10 +1059,24 @@ int main(int argc, char * argv[]) {
           add_count, to_add, intersectionsize, mixed_sets,  true);
       cout << setw(NAME_WIDTH) << names[a] << cf << endl;
   }
+  a = 226;
+  if (algorithmId == a || algorithmId < 0 || (algos.find(a) != algos.end())) {
+      auto cf = FilterBenchmark<
+          xorfusefilter_lowmem::XorFuseFilter<uint64_t, uint8_t>>(
+          add_count, to_add, intersectionsize, mixed_sets,  true);
+      cout << setw(NAME_WIDTH) << names[a] << cf << endl;
+  }
   a = 227;
   if (algorithmId == a || algorithmId < 0 || (algos.find(a) != algos.end())) {
       auto cf = FilterBenchmark<
           xorfusefilter_lowmem::XorFuseFilter<uint64_t, uint16_t>>(
+          add_count, to_add, intersectionsize, mixed_sets,  true);
+      cout << setw(NAME_WIDTH) << names[a] << cf << endl;
+  }
+  a = 228;
+  if (algorithmId == a || algorithmId < 0 || (algos.find(a) != algos.end())) {
+      auto cf = FilterBenchmark<
+          xorfusefilter_lowmem4wise::XorFuseFilter<uint64_t, uint8_t>>(
           add_count, to_add, intersectionsize, mixed_sets,  true);
       cout << setw(NAME_WIDTH) << names[a] << cf << endl;
   }
