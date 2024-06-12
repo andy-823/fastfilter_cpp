@@ -160,9 +160,17 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
   size_t *alone = new size_t[arrayLength];
   hashIndex = 0;
 
-  // size_t max_iter = 1;
-  // while (max_iter--) 
-  while (true)
+  #ifdef XOR_FUSE_EXPERIMENT_1 // to produce 1st experiment
+  size_t max_iter = 20;
+  while (max_iter--) 
+  #else 
+  # ifdef XOR_FUSE_EXPERIMENT_2 // to produce 2nd experiment
+  size_t max_iter = 1;
+  while (max_iter--)
+  # else
+  while (true) // in usual life
+  # endif
+  #endif
   {
     memset(edgeCount, 0, sizeof(uint16_t) * arrayLength);
     memset(edgeXor, 0, sizeof(edge) * arrayLength);
@@ -342,10 +350,12 @@ Status XorFuseFilter<ItemType, FingerprintType, HashFamily>::AddAll(
   delete[] edgeXor;
   delete[] edgeCount;
 
-  // if (reverseOrderPos != size)
-  // {
-  //   throw std::runtime_error("xorfusefilter-vanilla: ininite_cycle");
-  // }
+  #ifdef XOR_FUSE_EXPERIMENT_1
+  if (reverseOrderPos != size)
+  {
+    throw std::runtime_error("xorfusefilter-vanilla: ininite_cycle");
+  }
+  #endif
 
   // the array h0, h1, h2, h3, h0, h1, h2, h3
   uint32_t h0123[7];

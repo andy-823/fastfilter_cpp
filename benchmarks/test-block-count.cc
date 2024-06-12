@@ -1,3 +1,5 @@
+#define XOR_FUSE_EXPERIMENT_1
+
 #include <iostream>
 #include <iomanip>
 
@@ -82,6 +84,7 @@ void stream_block_count(const test_params &params)
 int main()
 {
   test_params params;
+  // params.size_steps = 4;
   params.one_test_tries = 10;
   std::cout << "xorfusefilter_vanilla\n";
   stream_block_count<xorfusefilter_vanilla::XorFuseFilter<uint64_t, uint8_t>>(params);

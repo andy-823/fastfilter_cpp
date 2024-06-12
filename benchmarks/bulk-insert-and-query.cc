@@ -412,7 +412,7 @@ int main(int argc, char * argv[]) {
     {219, "XorFuse16-vanilla-4wise"},
     {226, "XorFuse8"},
     {227, "XorFuse16"},
-    {228, "XorFuse-4wise"},
+    {228, "XorFuse8-4wise"},
     {229, "XorFuse16-4wise"},
 
     {1056, "HomogRibbon64_5"},

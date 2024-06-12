@@ -1,3 +1,5 @@
+#define XOR_FUSE_EXPERIMENT_1
+
 #include <iostream>
 #include <iomanip>
 #include <cmath>
